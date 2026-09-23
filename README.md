@@ -18,6 +18,18 @@
 | `模型图.png` | 研究模型图（黑白） |
 | `ai-dialog-export-*.json` | AI 对话记录导出（由 `ai-dialog-export` 技能生成） |
 
+## 工具
+
+| 脚本 | 用途 |
+| --- | --- |
+| `tools/md2docx.py` | 把 Markdown 转成 Word（需 `pip install python-docx`） |
+
+仓库以 `.md` 为**版本化的源文件**；`.docx` 是生成物，已在 `.gitignore` 中忽略。需要 Word 时运行：
+
+```bash
+python3 tools/md2docx.py 研究总览.md 研究总览.docx
+```
+
 ## 作者
 
 [@gastby-ghost](https://github.com/gastby-ghost)
