@@ -1,0 +1,31 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# Office / WPS 临时文件
+~$*.doc
+~$*.docx
+~$*.ppt
+~$*.pptx
+~$*.xls
+~$*.xlsx
+.~lock.*
+
+# 编辑器
+.vscode/
+.idea/
+*.swp
+
+# 环境变量与密钥（公开仓库，务必不要提交）
+.env
+.env.*
+!.env.example
+
+# 临时文件
+*.tmp
+*.log
