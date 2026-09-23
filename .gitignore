@@ -29,3 +29,6 @@ Desktop.ini
 # 临时文件
 *.tmp
 *.log
+
+# Word 导出（二进制，可由 .md 重新生成，不入版本控制）
+*.docx
