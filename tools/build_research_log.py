@@ -51,17 +51,19 @@ def main():
 
     def repl(m):
         n = int(m.group(1))
+        turn = int(m.group(2)) if m.group(2) else None
         if n not in index:
             missing.append(n)
             return f"> （缺第 {n} 份对话记录，请确认 `ai-dialog-export-*.json` 是否齐全）"
-        used.append(n)
-        return dialogs_to_md.render(index[n], n, level=LEVEL)
+        used.append((n, turn))
+        return dialogs_to_md.render(index[n], n, level=LEVEL,
+                                    turns=[turn] if turn else None)
 
-    text = re.sub(r"<!--DIALOG:(\d+)-->", repl, text)
+    text = re.sub(r"<!--DIALOG:(\d+)(?::(\d+))?-->", repl, text)
 
     if missing:
         print(f"警告：占位符引用了不存在的记录 {missing}", file=sys.stderr)
-    print(f"源文件：{args.source}｜已嵌入 {len(used)} 份对话记录：{used}", file=sys.stderr)
+    print(f"源文件：{args.source}｜已嵌入 {len(used)} 处对话：{used}", file=sys.stderr)
 
     tmp = os.path.join(ROOT, "_research_log_tmp.md")
     with open(tmp, "w", encoding="utf-8") as fh:

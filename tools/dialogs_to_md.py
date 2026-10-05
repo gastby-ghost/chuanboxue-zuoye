@@ -29,20 +29,31 @@ def esc_heading(text):
     return "\n".join(re.sub(r"^#{1,6}\s+(.*)$", r"**\1**", ln) for ln in text.split("\n"))
 
 
-def render(path, idx, level=3):
-    """把一份导出渲染为 Markdown；level 为「记录」标题的层级（轮次低一级）。"""
+def render(path, idx, level=3, turns=None):
+    """把一份导出渲染为 Markdown。
+
+    level —— 「记录」标题的层级（轮次低一级）
+    turns —— 只渲染这些轮次（None = 全部）。为 None 时输出「记录」抬头，
+             指定轮次时只输出轮次块，便于把不同轮次摆到正文的不同位置。
+    """
     with open(path, encoding="utf-8") as fh:
         d = json.load(fh)
     m = d.get("session_meta", {})
     h1, h2 = "#" * level, "#" * (level + 1)
-    out = [
-        f"{h1} 记录 {idx}｜{m.get('stage', '—')} 阶段（{m.get('total_turns', len(d.get('turns', [])))} 轮）",
-        "",
-        f"- 平台：{m.get('platform', '—')}　模型：{m.get('model', '—')}　导出时间：{m.get('export_time', '—')}",
-        f"- 主题：{m.get('topic', '—')}　源文件：`{os.path.basename(path)}`",
-        "",
-    ]
-    for t in d.get("turns", []):
+    all_turns = d.get("turns", [])
+    out = []
+    if turns is None:
+        sel = all_turns
+        out += [
+            f"{h1} 记录 {idx}｜{m.get('stage', '—')} 阶段（{len(all_turns)} 轮）",
+            "",
+            f"- 平台：{m.get('platform', '—')}　模型：{m.get('model', '—')}　导出时间：{m.get('export_time', '—')}",
+            f"- 主题：{m.get('topic', '—')}　源文件：`{os.path.basename(path)}`",
+            "",
+        ]
+    else:
+        sel = [t for t in all_turns if t.get("turn") in turns]
+    for t in sel:
         out += [f"{h2} 轮 {t.get('turn')}｜用户", "", esc_heading(t.get("user_text", "").strip()), ""]
         out += [f"{h2} 轮 {t.get('turn')}｜AI", "", esc_heading(t.get("assistant_text", "").strip()), ""]
         if t.get("actions"):
