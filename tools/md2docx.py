@@ -97,7 +97,7 @@ def convert(src, out):
                 doc.add_picture(path, width=Inches(5.0))
             i += 1
             continue
-        m_pic = re.search(r"配图见\s*`([^`]+\.(?:png|jpg|jpeg))`", ln)
+        m_pic = re.search(r"配图见[^\n]*?`([^`]+\.(?:png|jpg|jpeg))`", ln)
         if m_pic:
             path = os.path.join(base, m_pic.group(1))
             if os.path.exists(path):
