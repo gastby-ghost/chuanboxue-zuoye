@@ -34,6 +34,10 @@ reasonix.toml
 *.tmp
 *.log
 
+# Python 缓存
+__pycache__/
+*.pyc
+
 # Word 导出：源为 .md，可用 tools/ 下的脚本随时重新生成，不入库
 *.doc
 *.docx
@@ -41,3 +45,7 @@ reasonix.toml
 # 研究数据与分析产物（含模拟数据，均可由脚本重新生成）
 data/
 outputs/
+
+# chat-relay 模式本地状态：开关文件（仅仓库根）与在途会话；技能本体在 .reasonix/，不受影响
+/chat-relay/
+topics/**/chat-relay/
