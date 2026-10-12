@@ -11,6 +11,7 @@
 | `presentation/` | 小组展示：PPT 内容稿、演讲稿 |
 | `figures/` | 图：模型图、理论推导链、实验流程、检验力曲线 |
 | `tools/` | 脚本（见「工具」） |
+| `.reasonix/skills/` | AI 技能：`chat-relay`（chat 接力模式，见下）、`ai-dialog-export`（生成 `archive/dialogs/` 导出） |
 
 仓库以 `.md` 为**版本化的源文件**；`.docx` 为生成物，不在版本控制中，需要时用 `tools/` 下的脚本按需重新生成。
 
@@ -44,6 +45,40 @@
 | `小组展示-PPT内容.md` | **展示用（按块累积）**：目前含「A 块·实验设计（细版，11 页，含 6 处思想博弈）」 |
 | `小组展示-演讲稿.md` | **展示用（按块累积）**：目前含「A 块·实验设计」的逐页口播稿（约 18 分钟） |
 
+## chat 接力模式（chat-relay）
+
+技能位于 `.reasonix/skills/chat-relay/`：**内容走 chat，运行走执行**——凡需要人理解、讨论、判断、成稿的内容产出（含需独立判定者的锚定判读），改由 ChatGPT 与用户讨论产出；agent 只做备料、表态与实施。判读／编码／计算等可复算的执行性运行不走此通道，由执行侧 skill 直接完成。
+
+开关（在对话中直接发斜杠命令；等价脚本入口见「常用命令」）：
+
+| 命令 | 动作 |
+| --- | --- |
+| `/chat-relay` | 开启；已开启则报「已是开启状态」 |
+| `/chat-relay off` | 关闭（在途会话文件保留） |
+| `/chat-relay status` | 只读报告：开关＋在途会话及各自等谁 |
+
+一个 chat 环的标准动作（完整规程：`.reasonix/skills/chat-relay/references/protocol.md`）：
+
+1. **先分析**——读真实工件：本轮要人理解／判断什么、产出要什么形态、不可丢失清单、术语表；
+2. **备料**——建会话目录 `topics/<选题>/chat-relay/{YYYY-MM-DD}-{slug}/`：写自包含的 `提示词.md`（chat 不知道仓库的存在）；把它需要的源文件**原样复制**进 `上传包/`（单次上传上限 20 份，超出按同类合卷，不用摘要代替原件）；
+3. **交接**——把 `上传包/` 全部拖进 ChatGPT，`提示词.md` 全文贴过去；讨论完把分享链接带回（或把产出存进 `回报/`）；
+4. **回程**——贴回 `https://chatgpt.com/share/…` 链接，由 `scripts/fetch-share.py` 直接落盘 `回报/r{N}.md`（格式与伪影说明：`references/chatgpt-share-format.md`）；
+5. **表态（必须）**——按保真／事实／可装回三轴核对：同意即按归属 skill 的写入契约实施；反对则写 `提示词-r{N+1}.md` 具体到句，带回 chat；
+6. **收敛**——实施完毕，台账记结果，会话收尾。
+
+会话目录（归对应选题，平铺与分组布局通用）：
+
+```
+topics/<选题>/chat-relay/{YYYY-MM-DD}-{slug}/
+├── 提示词.md        # 贴给 ChatGPT；第二轮起：提示词-r2.md…
+├── 上传包/          # F1-简称.md、F2-简称.md…（源文件副本，原件不动）
+├── 台账.md          # 状态、材料、轮次、实施记录
+└── 回报/            # r1.md、r2.md…（chat 产出落盘）
+```
+
+- 开关只由用户命令触发，不自动开启；每轮提醒入口登记在根目录 `AGENTS.md`（等价原 Claude Code 的 UserPromptSubmit 钩子）。
+- 开关文件（`chat-relay/ON`）与会话目录（`topics/**/chat-relay/`）为本地工作状态，均不入库（见 `.gitignore`）。
+
 ## 工具
 
 | 脚本 | 用途 |
@@ -76,6 +111,14 @@ python3 tools/analysis_pipeline.py --data data/clean.csv   # 有真实数据后�
 
 # AI 对话导出 JSON → Markdown（逐轮原文）
 python3 tools/dialogs_to_md.py archive/dialogs/ai-dialog-export-*.json
+
+# chat 接力模式：开关（on / off / status / check）
+bash .reasonix/skills/chat-relay/scripts/chat-relay.sh status
+
+# chat 接力模式：回程落盘（ChatGPT 分享链接 → 回报/r{N}.md）
+python3 .reasonix/skills/chat-relay/scripts/fetch-share.py "<分享链接>" \
+  --drop-prompt "topics/<选题>/chat-relay/{slug}/提示词.md" \
+  --output-dir "topics/<选题>/chat-relay/{slug}/回报/"
 ```
 
 分析产物写入 `outputs/`；`data/`、`outputs/` 与 `*.docx` 均已在 `.gitignore` 中忽略。
