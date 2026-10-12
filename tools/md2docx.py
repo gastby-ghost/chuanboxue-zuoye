@@ -3,10 +3,11 @@
 
 用法：
     pip install python-docx
-    python3 tools/md2docx.py 研究总览.md 研究总览.docx
+    python3 tools/md2docx.py docs/研究总览.md 研究总览.docx
 
-说明：本仓库以 .md 为版本化的源文件，.docx 是生成物（已在 .gitignore 中忽略）。
-需要重做 Word 时跑一次即可，不必把二进制塞进 git 历史。
+说明：本仓库以 .md 为版本化的源文件（位于 docs/、archive/、presentation/ 等子目录），
+.docx 是生成物（已在 .gitignore 中忽略）。需要重做 Word 时跑一次即可，
+不必把二进制塞进 git 历史。
 
 支持的语法：标题（#–####）、表格（| |）、无序/有序列表、引用（>）、
 代码块（```）、粗体（**）、行内代码（`）、图片（![alt](path)）。
@@ -26,6 +27,24 @@ except ImportError:
 CN_FONT = "STHeiti"          # 中文字体（macOS 自带；Windows 可改为「微软雅黑」）
 MONO_FONT = "Courier New"
 H_SIZE = {1: 17, 2: 14, 3: 12, 4: 11}
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
+def resolve_image(path, base):
+    """把图片路径解析为实际存在的文件，找不到返回 None。
+
+    依次尝试：md 文件所在目录 → 仓库根 → 仓库根/figures/。
+    这样文档放在子目录时，写 `../figures/x.png`、`figures/x.png` 或
+    仅 `x.png`（图在 figures/ 下）都能定位到。
+    """
+    if os.path.isabs(path):
+        return path if os.path.exists(path) else None
+    for cand in (os.path.join(base, path),
+                 os.path.join(ROOT, path),
+                 os.path.join(ROOT, "figures", os.path.basename(path))):
+        if os.path.exists(cand):
+            return cand
+    return None
 
 
 def add_runs(p, text):
@@ -90,18 +109,20 @@ def convert(src, out):
         # 图片：本仓库约定「（配图见 `x.png`）」或标准 ![alt](path)
         m_img = re.search(r"!\[[^\]]*\]\(([^)]+)\)", ln)
         if m_img:
-            path = m_img.group(1)
-            if not os.path.isabs(path):
-                path = os.path.join(base, path)
-            if os.path.exists(path):
+            path = resolve_image(m_img.group(1), base)
+            if path:
                 doc.add_picture(path, width=Inches(5.0))
+            else:
+                print("警告：找不到图片 %s（来自 %s）" % (m_img.group(1), src), file=sys.stderr)
             i += 1
             continue
         m_pic = re.search(r"配图见[^\n]*?`([^`]+\.(?:png|jpg|jpeg))`", ln)
         if m_pic:
-            path = os.path.join(base, m_pic.group(1))
-            if os.path.exists(path):
+            path = resolve_image(m_pic.group(1), base)
+            if path:
                 doc.add_picture(path, width=Inches(5.0))
+            else:
+                print("警告：找不到图片 %s（来自 %s）" % (m_pic.group(1), src), file=sys.stderr)
             i += 1
             continue
 

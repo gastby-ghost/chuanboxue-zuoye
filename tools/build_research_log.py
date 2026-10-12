@@ -3,16 +3,16 @@
 
 用法
     python3 tools/build_research_log.py [输出.docx] [--source 源.md]
-    # 缺省：源 = 研究从0到1-全过程日志.md，输出 = 同名 .docx
+    # 缺省：源 = archive/研究从0到1-全过程日志.md，输出 = 同名 .docx
 
     # 例：生成理论演进日志
-    python3 tools/build_research_log.py --source 理论从0到1-演进日志.md 理论从0到1-演进日志.docx
+    python3 tools/build_research_log.py --source archive/理论从0到1-演进日志.md 理论从0到1-演进日志.docx
 
 原理
-    源文件 `研究从0到1-全过程日志.md` 在需要嵌入对话的位置留有占位符
-    `<!--DIALOG:n-->`，n 为 `ai-dialog-export-*.json` 按文件名排序后的序号
-    （文件名含时间戳，即研讨的时间顺序）。本脚本把对应记录的**全部轮次原文**
-    嵌进去，再交给 md2docx 导出 Word；源文件本身保持不含原文。
+    源文件 `archive/研究从0到1-全过程日志.md` 在需要嵌入对话的位置留有占位符
+    `<!--DIALOG:n-->`，n 为 `archive/dialogs/ai-dialog-export-*.json` 按文件名
+    排序后的序号（文件名含时间戳，即研讨的时间顺序）。本脚本把对应记录的
+    **全部轮次原文**嵌进去，再交给 md2docx 导出 Word；源文件本身保持不含原文。
 
 依赖
     python3 -m pip install python-docx
@@ -36,12 +36,12 @@ def main():
     ap = argparse.ArgumentParser(description="把带对话占位符的日志 md 导出为 Word")
     ap.add_argument("out", nargs="?", default="研究从0到1-全过程日志.docx",
                     help="输出 .docx（缺省：研究从0到1-全过程日志.docx）")
-    ap.add_argument("--source", default="研究从0到1-全过程日志.md",
+    ap.add_argument("--source", default="archive/研究从0到1-全过程日志.md",
                     help="源 md（含 <!--DIALOG:n--> 占位符）")
     args = ap.parse_args()
 
     source = os.path.join(ROOT, args.source)
-    dialogs = sorted(glob.glob(os.path.join(ROOT, "ai-dialog-export-*.json")))
+    dialogs = sorted(glob.glob(os.path.join(ROOT, "archive", "dialogs", "ai-dialog-export-*.json")))
     index = {i: p for i, p in enumerate(dialogs, 1)}
 
     with open(source, encoding="utf-8") as fh:

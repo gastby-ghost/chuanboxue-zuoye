@@ -22,6 +22,9 @@ Desktop.ini
 .idea/
 *.swp
 
+# 本机工具配置
+reasonix.toml
+
 # 环境变量与密钥（公开仓库，务必不要提交）
 .env
 .env.*
@@ -31,9 +34,9 @@ Desktop.ini
 *.tmp
 *.log
 
-# Word 导出：已纳入版本控制（源为 .md，可随时重新生成）
-# 若不希望入库，取消下一行的注释即可
-# *.docx
+# Word 导出：源为 .md，可用 tools/ 下的脚本随时重新生成，不入库
+*.doc
+*.docx
 
 # 研究数据与分析产物（含模拟数据，均可由脚本重新生成）
 data/

@@ -121,7 +121,7 @@ description: 将当前窗口的完整AI对话记录结构化导出为JSON（含�
 
 6. 用户确认后，输出**最终版JSON**，其中turning_point字段和session_meta中的三个转折点相关数组均已更新完毕。
 7. 如果用户回复"无"，则直接生成最终版JSON（所有turning_point保持false，turning_point_descriptions为空数组）。
-8. **最终版JSON不是仅在对话中展示，而是要写入一个文件**：用 Write 工具把完整JSON内容写入本机文件，文件名建议为 `ai-dialog-export-<topic>-<YYYYMMDD-HHMMSS>.json`（`<topic>` 取步骤一的主题，若含空格或特殊字符可替换为短横线）。写入后向用户报告文件的绝对路径与轮次数。
+8. **最终版JSON不是仅在对话中展示，而是要写入一个文件**：用 Write 工具把完整JSON内容写入本机文件，文件名建议为 `ai-dialog-export-<topic>-<YYYYMMDD-HHMMSS>.json`（`<topic>` 取步骤一的主题，若含空格或特殊字符可替换为短横线）。在本仓库（传播学作业）中请保存到 `archive/dialogs/` 目录（构建日志的脚本按该目录收集记录）。写入后向用户报告文件的绝对路径与轮次数。
 
 ---
 

@@ -9,8 +9,8 @@
     python3 -m pip install python-docx
 
 说明
-    三份 .md 仍是各自的源文件；本脚本只做合并导出，不改动源文件。
-    正文中的图片按相对仓库根目录的路径解析（`模型图.png`、`figures/*.png`）。
+    三份源文件位于 docs/ 目录；本脚本只做合并导出，不改动源文件。
+    正文中的图片由 md2docx 自动解析（md 所在目录 → 仓库根 → 仓库根/figures/）。
 """
 import os
 import re
@@ -22,9 +22,9 @@ import md2docx  # noqa: E402
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 PARTS = [
-    ("研究设计.md", "第一部分　研究设计"),
-    ("测量工具.md", "第二部分　测量工具：问卷与编码手册"),
-    ("预注册与分析.md", "第三部分　预注册与分析方案"),
+    ("docs/研究设计.md", "第一部分　研究设计"),
+    ("docs/测量工具.md", "第二部分　测量工具：问卷与编码手册"),
+    ("docs/预注册与分析.md", "第三部分　预注册与分析方案"),
 ]
 
 PREAMBLE = """# 研究设计（完整版）
